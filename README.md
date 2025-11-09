@@ -13,6 +13,57 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 * **PostgreSQL**: Una instancia de base de datos PostgreSQL corriendo localmente o en la nube.
 * **Token de HubSpot**: Un "Token de Acceso Privado" (Private App Token) de HubSpot.
 
+## 🛠️ Herramientas y Tecnologías Utilizadas
+
+Este proyecto fue construido con las siguientes tecnologías clave para garantizar un flujo ETL robusto, tipado y escalable:
+
+*  **NestJS**: UnFramework de Backend: NestJS (TypeScript).
+
+Razón: Proporciona una arquitectura modular y orientada a objetos (OOP) que facilita la separación de responsabilidades (Extract, Transform, Load) en servicios aislados.
+
+*  **PostgreSQL**: Base de Datos (Data Warehouse): PostgreSQL.
+
+Razón: Es robusto, gratuito y ofrece soporte nativo para UPSERT (ON CONFLICT DO UPDATE), esencial para la idempotencia del proceso de carga (L).
+
+* **Conector DB**: node-postgres (pg).
+
+Razón: Se utiliza directamente sin un ORM para un control total sobre las consultas SQL masivas y optimizadas (unnest).
+
+* **Extracción (E)**: @hubspot/api-client (SDK Oficial).
+
+Razón: Proporciona manejo nativo de la paginación y la autenticación, reduciendo la complejidad del código HTTP manual.
+
+* **Documentación API**: Swagger (@nestjs/swagger).
+
+Razón: Genera una interfaz OpenAPI interactiva (/api/docs), vital para probar y documentar los endpoints de orquestación y analítica.
+
+
+## 💡 Decisiones Técnicas Clave
+
+Las siguientes decisiones arquitectónicas se tomaron para garantizar la calidad, la idempotencia y la mantenibilidad del proyecto:
+
+1. Manejo de la Carga (Load) y la Idempotencia
+Técnica: Se implementó una lógica de UPSERT masivo (INSERT INTO ... ON CONFLICT (hubspot_deal_id) DO UPDATE SET ...) en WarehouseService.
+
+Justificación: Esto garantiza que el proceso ETL pueda ejecutarse múltiples veces sin crear duplicados. 
+
+2. Tipado Estricto de Datos (End-to-End)
+Técnica: Se definieron DTOs de tres tipos (RawDto, TransformedDto, ResponseDto) para tipar cada etapa del flujo ETL (E, T, L).
+
+Justificación: Se eliminó el uso de any en servicios, garantizando la seguridad de tipos y facilitando el refactoring y la depuración del código.
+
+3. Arquitectura y Separación de Intereses (Clean Code)
+Técnica: Separación de strings de consultas SQL y listas de propiedades de HubSpot a archivos de constantes (.sql.ts, .constants.ts).
+
+Justificación: Mantiene los servicios de negocio (AnalyticsService, WarehouseService) limpios, centrándose solo en la lógica de conexión y orquestación, no en la sintaxis de las queries.
+
+4. Decisión Crítica: Autenticación de HubSpot
+Técnica Elegida (PoC): Uso de un Private App Token directo (HUBSPOT_PRIVATE_APP_TOKEN).
+
+Justificación: Esta opción fue elegida por su simplicidad para la Prueba de Concepto (PoC) y su fácil configuración inicial.
+
+Riesgo y Corrección (Producción): Este token de prueba expira en pocas horas. Para un entorno de producción, la decisión técnica obligatoria sería migrar a la autenticación OAuth 2.0 (Refresh Token y Access Token). Esta requiere la gestión de client_id y client_secret para la renovación automática y garantizar la estabilidad del servicio ETL 24/7.
+
 ## 🚀 Pasos de Instalación y Ejecución
 
 1.  **Clonar el Repositorio:**
@@ -94,6 +145,14 @@ El proyecto requiere las siguientes variables de entorno. Note que la autenticac
 | :--- | :--- | :--- |
 | `DATABASE_URL` | URL de conexión a PostgreSQL (Ej: `postgresql://user:pass@host:port/dbname`). | `postgresql://...` |
 | **`HUBSPOT_PRIVATE_APP_TOKEN`** | **Token de Acceso (AccessToken) de la aplicación privada/personal de HubSpot.** Este es el valor de la clave de acceso de desarrollo. | `CP6m1cumMxIg...` |
+
+## ⚠️ Advertencia sobre la Autenticación de HubSpot (CRÍTICA)
+
+El token actual (`HUBSPOT_PRIVATE_APP_TOKEN`) es un **`accessToken` de vida corta** (aprox. 30 minutos) proporcionado por la interfaz de desarrollo de HubSpot.
+
+* **Estado Actual:** El `HubspotService` usa este token para la prueba de concepto y la conexión es exitosa.
+* **Problema de Estabilidad:** En un entorno de producción, este token **expirará rápidamente**, causando fallos en el ETL.
+* **Solución de Producción:** La solución robusta y estable (que la API requiere) es implementar el flujo **OAuth 2.0** que utiliza un **Refresh Token** junto con el `Client ID` y `Client Secret` para la renovación automática. Esta configuración es necesaria para la estabilidad a largo plazo.
 
 ## 🌐 Endpoints de la API
 
