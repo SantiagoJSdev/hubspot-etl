@@ -5,6 +5,7 @@ import {
   TransformedDealDto, 
   TransformedLeadDto 
 } from '../warehouse/dto/transformed.dto';
+import { RawContactDto, RawDealDto } from 'src/hubspot/dto/raw-hubspot.dto';
 
 @Injectable()
 export class DataSyncService {
@@ -20,8 +21,8 @@ export class DataSyncService {
    */
   async runFullSync(): Promise<void> {
     this.logger.log('--- Proceso ETL iniciado ---');
-    const rawDeals = await this.hubspotService.getAllDeals();
-    const rawLeads = await this.hubspotService.getAllContacts();
+    const rawDeals: RawDealDto[] = await this.hubspotService.getAllDeals();
+    const rawLeads: RawContactDto[] = await this.hubspotService.getAllContacts();
     this.logger.log(`Extraídos: ${rawDeals.length} Deals, ${rawLeads.length} Leads.`);
     const transformedDeals = this.transformDeals(rawDeals);
     const transformedLeads = this.transformLeads(rawLeads);
@@ -36,7 +37,7 @@ export class DataSyncService {
    * Lógica de Transformación (T) para Deals.
    * Responsabilidad: Aplanar, limpiar y estandarizar datos crudos de HubSpot a nuestro esquema DW.
    */
-  private transformDeals(rawDeals: any[]): TransformedDealDto[] {
+  private transformDeals(rawDeals: RawDealDto[]): TransformedDealDto[] {
     return rawDeals.map((deal) => {
       const properties = deal.properties;
       const amountValue = properties.amount ? parseFloat(properties.amount) : null;
@@ -54,7 +55,7 @@ export class DataSyncService {
   /**
    * Lógica de Transformación (T) para Leads (Contacts).
    */
-  private transformLeads(rawLeads: any[]): TransformedLeadDto[] {
+  private transformLeads(rawLeads: RawContactDto[]): TransformedLeadDto[] {
     return rawLeads.map((lead) => {
       const properties = lead.properties;
       return {

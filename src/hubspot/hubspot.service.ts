@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from '@hubspot/api-client'; // Importar el SDK
 import { CONTACT_PROPERTIES, DEAL_PROPERTIES } from './constants/hubspot.constants';
+import { RawContactDto, RawDealDto } from './dto/raw-hubspot.dto';
 
 @Injectable()
 export class HubspotService {
@@ -21,7 +22,7 @@ export class HubspotService {
   }
 
   // --- Método de Extracción de DEALS (Tratos) ---
-  async getAllDeals(): Promise<any[]> {
+  async getAllDeals(): Promise<RawDealDto[]> {
     this.logger.log('Iniciando extracción de Deals...');
     const allDeals = [];
     let hasMore = true;
@@ -38,7 +39,7 @@ export class HubspotService {
           false       
         );
 
-        allDeals.push(...response.results);
+        allDeals.push(...(response.results as RawDealDto[]) );
         
         // Manejo de paginación del SDK
         if (response.paging && response.paging.next) {
@@ -56,7 +57,7 @@ export class HubspotService {
   }
 
   // --- Método de Extracción de CONTACTS (Leads) ---
-  async getAllContacts(): Promise<any[]> {
+  async getAllContacts(): Promise<RawContactDto[]> {
     this.logger.log('Iniciando extracción de Contacts (Leads)...');
     const allContacts = [];
     let hasMore = true;
@@ -74,7 +75,7 @@ export class HubspotService {
           false     
         );
 
-        allContacts.push(...response.results);
+        allContacts.push(...(response.results as RawContactDto[]))
         
         // Manejo de paginación del SDK
         if (response.paging && response.paging.next) {
