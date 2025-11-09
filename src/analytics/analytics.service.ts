@@ -6,6 +6,7 @@ import {
   GET_REVENUE_SUMMARY_QUERY, 
   GET_LEADS_COUNT_QUERY 
 } from './sql/analytics.sql';
+import { LeadsCountDto, RevenueSummaryDto } from './dto/analytics-response.dto';
 
 @Injectable()
 export class AnalyticsService implements OnModuleInit {
@@ -24,7 +25,7 @@ export class AnalyticsService implements OnModuleInit {
   /**
    * Obtiene el total de ingresos y el conteo de tratos cerrados ganados.
    */
-  async getDealsRevenueSummary(): Promise<any> {
+  async getDealsRevenueSummary(): Promise<RevenueSummaryDto> {
       
     const res = await this.pool.query(GET_REVENUE_SUMMARY_QUERY);
     return {
@@ -36,8 +37,10 @@ export class AnalyticsService implements OnModuleInit {
   /**
    * Obtiene el número total de leads (contactos) cargados.
    */
-  async getTotalLeadsCount(): Promise<number> {
+  async getTotalLeadsCount(): Promise<LeadsCountDto> {
     const res = await this.pool.query(GET_LEADS_COUNT_QUERY);
-    return parseInt(res.rows[0].total) || 0;
+    return { 
+            total_leads: parseInt(res.rows[0].total) || 0 
+           };
+        }
   }
-}

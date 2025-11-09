@@ -34,8 +34,7 @@ export class AnalyticsController {
   async getLeadsCount(): Promise<LeadsCountDto> {
     this.logger.log('Solicitud recibida: GET /analytics/leads-count');
     try {
-      const count = await this.analyticsService.getTotalLeadsCount();
-      return { total_leads: count };
+      return await this.analyticsService.getTotalLeadsCount();
     } catch (error) {
       this.logger.error('Error al obtener el conteo de leads', error.stack);
       throw new InternalServerErrorException({
