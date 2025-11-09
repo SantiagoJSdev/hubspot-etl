@@ -22,7 +22,6 @@ export class AnalyticsController {
       return await this.analyticsService.getDealsRevenueSummary();
     } catch (error) {
       this.logger.error('Error al obtener el resumen de ingresos', error.stack);
-      // Usamos la excepción estándar para devolver un 500 limpio.
       throw new InternalServerErrorException({
         message: 'Error al consultar la base de datos de análisis.',
         details: error.message,
@@ -39,7 +38,6 @@ export class AnalyticsController {
       return { total_leads: count };
     } catch (error) {
       this.logger.error('Error al obtener el conteo de leads', error.stack);
-      // Usamos la excepción estándar para devolver un 500 limpio.
       throw new InternalServerErrorException({
         message: 'Error al consultar la base de datos de análisis.',
         details: error.message,

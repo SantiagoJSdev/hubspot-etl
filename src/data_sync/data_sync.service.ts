@@ -20,26 +20,15 @@ export class DataSyncService {
    */
   async runFullSync(): Promise<void> {
     this.logger.log('--- Proceso ETL iniciado ---');
-    
-    // **FIN NUEVA LÍNEA**
-
-    // --- 1. Extracción (Extract) ---
-    // --- 1. Extracción (Extract) ---
-    this.logger.log('Paso E: Extrayendo datos de HubSpot...');
     const rawDeals = await this.hubspotService.getAllDeals();
     const rawLeads = await this.hubspotService.getAllContacts();
     this.logger.log(`Extraídos: ${rawDeals.length} Deals, ${rawLeads.length} Leads.`);
-
-    // --- 2. Transformación (Transform) ---
-    this.logger.log('Paso T: Transformando datos...');
     const transformedDeals = this.transformDeals(rawDeals);
     const transformedLeads = this.transformLeads(rawLeads);
     this.logger.log('Datos transformados con éxito.');
-
-    // --- 3. Carga (Load) ---
-    this.logger.log('Paso L: Cargando datos en PostgreSQL...');
+    this.logger.log('Cargando datos en PostgreSQL...');
     await this.warehouseService.bulkUpsertDeals(transformedDeals);
-    await this.warehouseService.bulkUpsertLeads(transformedLeads); // Asumiendo que implementaste este método en 3.b
+    await this.warehouseService.bulkUpsertLeads(transformedLeads);
     this.logger.log('Carga completada. --- Proceso ETL finalizado ---');
   }
 
@@ -50,12 +39,9 @@ export class DataSyncService {
   private transformDeals(rawDeals: any[]): TransformedDealDto[] {
     return rawDeals.map((deal) => {
       const properties = deal.properties;
-      
-     // La lógica de transformación: Aplanar [cite: 58, 67][cite_start], Limpiar tipos [cite: 69][cite_start], Estandarizar [cite: 75, 76]
       const amountValue = properties.amount ? parseFloat(properties.amount) : null;
-      
       return {
-        hubspot_deal_id: deal.id, // ID del objeto de HubSpot
+        hubspot_deal_id: deal.id, 
         nombre_trato: properties.dealname || 'Sin Nombre',
         monto: amountValue,
         etapa: properties.dealstage || 'Sin Etapa',
@@ -71,9 +57,8 @@ export class DataSyncService {
   private transformLeads(rawLeads: any[]): TransformedLeadDto[] {
     return rawLeads.map((lead) => {
       const properties = lead.properties;
-      
       return {
-        hubspot_contact_id: lead.id, // ID del objeto de HubSpot
+        hubspot_contact_id: lead.id,
         email: properties.email || null,
         nombre: properties.firstname || null,
         apellido: properties.lastname || null,

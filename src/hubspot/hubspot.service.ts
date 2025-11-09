@@ -1,16 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from '@hubspot/api-client'; // Importar el SDK
+import { CONTACT_PROPERTIES, DEAL_PROPERTIES } from './constants/hubspot.constants';
 
 @Injectable()
 export class HubspotService {
   private readonly logger = new Logger(HubspotService.name);
   private hubspotClient: Client; // Usaremos el cliente del SDK
   
-  // Scopes de propiedades que queremos extraer
-  private readonly dealProperties = ['dealname', 'amount', 'dealstage', 'createdate', 'closedate'];
-  private readonly contactProperties =  ['email', 'firstname', 'lastname', 'createdate'];
-
   constructor(private readonly configService: ConfigService) {
     const hubspotToken = this.configService.get<string>('hubspot.privateAppToken');
     
@@ -32,14 +29,13 @@ export class HubspotService {
 
     try {
       while (hasMore) {
-        // Usar el SDK para la llamada
         const response = await this.hubspotClient.crm.deals.basicApi.getPage(
-          100,        // Límite por página
-          after,      // Cursor para paginación
-          this.dealProperties, // Propiedades a obtener
-          undefined,  // propertiesWithHistory
-          undefined,  // Associations
-          false       // Archived
+          100,        
+          after,      
+          DEAL_PROPERTIES, 
+          undefined,  
+          undefined,  
+          false       
         );
 
         allDeals.push(...response.results);
@@ -54,7 +50,6 @@ export class HubspotService {
       this.logger.log(`Extracción de Deals completada. Total: ${allDeals.length}`);
       return allDeals;
     } catch (error) {
-      // El SDK gestiona mejor los errores de autenticación (401)
       this.logger.error('Error en la extracción de Deals (SDK):', error.message);
       return []; 
     }
@@ -71,12 +66,12 @@ export class HubspotService {
       while (hasMore) {
         // Usar el SDK para la llamada
         const response = await this.hubspotClient.crm.contacts.basicApi.getPage(
-          100,       // Límite por página
-          after,     // Cursor para paginación
-          this.contactProperties, // Propiedades a obtener
-          undefined, // propertiesWithHistory
-          undefined, // Associations
-          false      // Archived
+          100,       
+          after,   
+          CONTACT_PROPERTIES, 
+          undefined, 
+          undefined, 
+          false     
         );
 
         allContacts.push(...response.results);
