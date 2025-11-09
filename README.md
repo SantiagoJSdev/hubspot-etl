@@ -72,13 +72,55 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
     npm run start:dev
     ```
 
----
-*(Sección a completar luego)*
-## 🤖 Endpoints de la API
 
-### Sincronización (ETL)
-* `POST /data-sync/run`: Inicia el proceso ETL completo manualmente.
+# 🚀 Proyecto ETL: HubSpot a Data Warehouse con NestJS
 
-### Analítica (Consultas)
-* `GET /analytics/...`: (Por definir)
+Este proyecto implementa un proceso ETL (Extract, Transform, Load) para sincronizar datos de **Deals (Tratos)** y **Contacts (Leads)** desde la API de HubSpot a un **Data Warehouse (DW)** basado en PostgreSQL, utilizando **NestJS** para la orquestación y el **SDK oficial de HubSpot** para la extracción.
+
+## 🏗️ Arquitectura del Proyecto
+
+El proyecto sigue una arquitectura modular, separada en componentes clave para un flujo ETL robusto:
+
+1.  **HubspotModule (Extract):** Se encarga de la comunicación con la API de HubSpot, maneja la autenticación y la paginación de los datos.
+2.  **DataSyncModule (Transform/Orchestrate):** El orquestador principal que dirige el flujo E -> T -> L. Contiene la lógica de transformación de datos (aplanamiento, limpieza y estandarización).
+3.  **WarehouseModule (Load):** Responsable de la persistencia de datos en PostgreSQL, utilizando `node-postgres` para realizar operaciones de **`UPSERT` masivo (`ON CONFLICT`)**.
+4.  **AnalyticsModule:** Expone APIs RESTful para consultar métricas clave directamente desde el Data Warehouse.
+
+## 🔑 Configuración de Credenciales (.env)
+
+El proyecto requiere las siguientes variables de entorno. Note que la autenticación con HubSpot usa un token de acceso directo.
+
+| Variable | Descripción | Valor |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | URL de conexión a PostgreSQL (Ej: `postgresql://user:pass@host:port/dbname`). | `postgresql://...` |
+| **`HUBSPOT_PRIVATE_APP_TOKEN`** | **Token de Acceso (AccessToken) de la aplicación privada/personal de HubSpot.** Este es el valor de la clave de acceso de desarrollo. | `CP6m1cumMxIg...` |
+
+## ⚠️ Advertencia sobre la Autenticación de HubSpot (CRÍTICA)
+
+El token actual (`HUBSPOT_PRIVATE_APP_TOKEN`) es un **`accessToken` de vida corta** (aprox. 30 minutos) proporcionado por la interfaz de desarrollo de HubSpot.
+
+* **Estado Actual:** El `HubspotService` usa este token para la prueba de concepto y la conexión es exitosa.
+* **Problema de Estabilidad:** En un entorno de producción, este token **expirará rápidamente**, causando fallos en el ETL.
+* **Solución de Producción:** La solución robusta y estable (que la API requiere) es implementar el flujo **OAuth 2.0** que utiliza un **Refresh Token** junto con el `Client ID` y `Client Secret` para la renovación automática. Esta configuración es necesaria para la estabilidad a largo plazo.
+
+## 🌐 Endpoints de la API
+
+El servidor NestJS opera en el puerto 3000.
+
+### 1. Sincronización (ETL Manual)
+Dispara el proceso completo de Extracción, Transformación y Carga.
+
+| Método | Path | Descripción |
+| :--- | :--- | :--- |
+| **POST** | `/data-sync/run` | Inicia el proceso de E-T-L de Deals y Leads de HubSpot a PostgreSQL. |
+
+### 2. Analítica (Consultas al DW)
+APIs que consultan la data limpia y transformada en el Data Warehouse.
+
+| Método | Path | Descripción | Ejemplo de Respuesta |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/analytics/revenue-summary` | Devuelve el **total de ingresos** y el **conteo de Tratos Ganados** (`closedwon`). | `{"total_revenue": 23500.0, "won_deals_count": 2}` |
+| **GET** | `/analytics/leads-count` | Devuelve el número total de **Leads** (Contactos) almacenados en el DW. | `{"total_leads": 50}` |
+
 ---
+
