@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { HubspotModule } from './hubspot/hubspot.module';
 import { ConfigModule } from '@nestjs/config';
 import { WarehouseModule } from './warehouse/warehouse.module';
@@ -19,8 +17,6 @@ import { configuration } from './config/app.config';
     WarehouseModule,
     DataSyncModule,
     AnalyticsModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  ]
 })
 export class AppModule {}
