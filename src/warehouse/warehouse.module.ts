@@ -3,6 +3,6 @@ import { WarehouseService } from './warehouse.service';
 
 @Module({
   providers: [WarehouseService],
-  exports: [WarehouseService], // Exportar el servicio
+  exports: [WarehouseService],
 })
 export class WarehouseModule {}
