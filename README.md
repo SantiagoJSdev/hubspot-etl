@@ -95,14 +95,6 @@ El proyecto requiere las siguientes variables de entorno. Note que la autenticac
 | `DATABASE_URL` | URL de conexión a PostgreSQL (Ej: `postgresql://user:pass@host:port/dbname`). | `postgresql://...` |
 | **`HUBSPOT_PRIVATE_APP_TOKEN`** | **Token de Acceso (AccessToken) de la aplicación privada/personal de HubSpot.** Este es el valor de la clave de acceso de desarrollo. | `CP6m1cumMxIg...` |
 
-## ⚠️ Advertencia sobre la Autenticación de HubSpot (CRÍTICA)
-
-El token actual (`HUBSPOT_PRIVATE_APP_TOKEN`) es un **`accessToken` de vida corta** (aprox. 30 minutos) proporcionado por la interfaz de desarrollo de HubSpot.
-
-* **Estado Actual:** El `HubspotService` usa este token para la prueba de concepto y la conexión es exitosa.
-* **Problema de Estabilidad:** En un entorno de producción, este token **expirará rápidamente**, causando fallos en el ETL.
-* **Solución de Producción:** La solución robusta y estable (que la API requiere) es implementar el flujo **OAuth 2.0** que utiliza un **Refresh Token** junto con el `Client ID` y `Client Secret` para la renovación automática. Esta configuración es necesaria para la estabilidad a largo plazo.
-
 ## 🌐 Endpoints de la API
 
 El servidor NestJS opera en el puerto 3000 y utiliza el prefijo global /api/v1 para todas las rutas.
