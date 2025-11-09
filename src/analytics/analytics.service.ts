@@ -4,9 +4,10 @@ import { Pool } from 'pg';
 
 import { 
   GET_REVENUE_SUMMARY_QUERY, 
-  GET_LEADS_COUNT_QUERY 
-} from './sql/analytics.sql';
-import { LeadsCountDto, RevenueSummaryDto } from './dto/analytics-response.dto';
+  GET_LEADS_COUNT_QUERY,
+  RevenueSummaryDto, 
+  LeadsCountDto 
+} from './';
 
 @Injectable()
 export class AnalyticsService implements OnModuleInit {

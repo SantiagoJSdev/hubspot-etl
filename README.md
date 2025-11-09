@@ -105,22 +105,23 @@ El token actual (`HUBSPOT_PRIVATE_APP_TOKEN`) es un **`accessToken` de vida cort
 
 ## 🌐 Endpoints de la API
 
-El servidor NestJS opera en el puerto 3000.
+El servidor NestJS opera en el puerto 3000 y utiliza el prefijo global /api/v1 para todas las rutas.
 
-### 1. Sincronización (ETL Manual)
-Dispara el proceso completo de Extracción, Transformación y Carga.
+## Documentación (Swagger/OpenAPI)
 
-| Método | Path | Descripción |
-| :--- | :--- | :--- |
-| **POST** | `/data-sync/run` | Inicia el proceso de E-T-L de Deals y Leads de HubSpot a PostgreSQL. |
+La documentación interactiva de la API (incluyendo esquemas de DTOs y pruebas directas) está disponible en:
+Recurso      Path
+Swagger UI   http://localhost:3000/api/docs
 
-### 2. Analítica (Consultas al DW)
-APIs que consultan la data limpia y transformada en el Data Warehouse.
+## Sincronización (ETL Manual)
 
-| Método | Path | Descripción | Ejemplo de Respuesta |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/analytics/revenue-summary` | Devuelve el **total de ingresos** y el **conteo de Tratos Ganados** (`closedwon`). | `{"total_revenue": 23500.0, "won_deals_count": 2}` |
-| **GET** | `/analytics/leads-count` | Devuelve el número total de **Leads** (Contactos) almacenados en el DW. | `{"total_leads": 50}` |
+Método     Path Completo             Descripción
+POST       /api/v1/data-sync/run     Inicia el proceso E-T-L de Deals y Leads de HubSpot a PostgreSQL.
 
----
+## Analítica (Consultas al DW)
 
+Método     Path Completo                         Descripción                                                                 Ejemplo de Respuesta
+GET        /api/v1/analytics/revenue-summary     Devuelve el total de ingresos y el conteo de Tratos Ganados (closedwon).    {"total_revenue": 23500.0, "won_deals_count": 2}
+
+
+GET        /api/v1/analytics/leads-count         Devuelve el número total de Leads (Contactos) almacenados en el DW.         {""total_leads"": 50}

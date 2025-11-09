@@ -8,8 +8,10 @@ import {
 } from '@nestjs/common';
 import { DataSyncService } from './data_sync.service';
 import { SyncResponseDto } from './dto/sync-response.dto'; 
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller('data-sync')
+@ApiTags('Data Sync (ETL)')
+@Controller('data-sync') 
 export class DataSyncController {
   private readonly logger = new Logger(DataSyncController.name);
   
@@ -17,6 +19,16 @@ export class DataSyncController {
 
   @Post('run')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Iniciar Sincronización Manual ETL', 
+    description: 'Dispara el proceso completo de Extracción, Transformación y Carga de datos desde HubSpot a PostgreSQL.' 
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'El proceso ETL se completó exitosamente.',
+    type: SyncResponseDto,
+  })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor durante el proceso ETL.' })
   async runSync(): Promise<SyncResponseDto> {
     this.logger.log('Solicitud recibida para iniciar la sincronización manual.');
     try {
