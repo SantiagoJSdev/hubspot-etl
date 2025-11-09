@@ -12,7 +12,7 @@ export class HubspotService {
   private readonly contactProperties =  ['email', 'firstname', 'lastname', 'createdate'];
 
   constructor(private readonly configService: ConfigService) {
-    const hubspotToken = this.configService.get<string>('HUBSPOT_PRIVATE_APP_TOKEN');
+    const hubspotToken = this.configService.get<string>('hubspot.privateAppToken');
     
     if (!hubspotToken) {
         throw new Error('HUBSPOT_PRIVATE_APP_TOKEN no está definido en .env');

@@ -11,7 +11,7 @@ export class AnalyticsService implements OnModuleInit {
 
   onModuleInit() {
     // Reutiliza la conexión de PostgreSQL. Asumimos el mismo pool que WarehouseService
-    const databaseUrl = this.configService.get<string>('DATABASE_URL');
+    const databaseUrl = this.configService.get<string>('database.url');
     if (!databaseUrl) {
       throw new Error('DATABASE_URL no está definida.');
     }

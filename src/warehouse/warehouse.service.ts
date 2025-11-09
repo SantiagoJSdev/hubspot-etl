@@ -13,7 +13,7 @@ export class WarehouseService implements OnModuleInit {
   // Usamos OnModuleInit para asegurar que el pool se cree
   // una vez que el ConfigService esté listo.
   onModuleInit() {
-    const databaseUrl = this.configService.get<string>('DATABASE_URL');
+    const databaseUrl = this.configService.get<string>('database.url');
     if (!databaseUrl) {
       throw new Error('DATABASE_URL no está definida en .env');
     }
